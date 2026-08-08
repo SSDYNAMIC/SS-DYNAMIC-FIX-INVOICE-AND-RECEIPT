@@ -145,7 +145,7 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
                                 <option value="7 Days">7 Days</option>
                                 <option value="14 Days (2 Week)">2 Week</option>
                                 <option value="30 Days (1 Months)">1 Months</option>
-                                <option value="60 Days (2 Months)">3 Months</option>
+                                <option value="60 Days (2 Months)">2 Months</option>
                                 <option value="90 Days (3 Months)">3 Months</option>
                             </select>
                         </div>
