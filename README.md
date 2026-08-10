@@ -141,7 +141,7 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 mb-1">Warranty Period</label>
                             <select id="warranty" onchange="updatePreview()" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:border-brandRed focus:outline-none">
-                                <option value="No Warranty">No Warranty</option>
+                                <option value="NO WARRANTY">NO WARRANTY</option>
                                 <option value="7 Days">7 Days</option>
                                 <option value="14 Days (2 Week)">2 Week</option>
                                 <option value="30 Days (1 Months)">1 Months</option>
