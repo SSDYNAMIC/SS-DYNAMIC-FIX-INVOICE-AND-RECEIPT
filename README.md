@@ -37,20 +37,23 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
             background-size: 30px 30px, 100% 100%, 80px 80px;
         }
 
-        /* Hide preview controls during PDF capture */
-        .pdf-export .no-print {
-            display: none !important;
-        }
-
+        /* Clean printable canvas adjustments for html2pdf export */
         .pdf-export {
             box-shadow: none !important;
+            border-radius: 0 !important;
             border: 1px solid #e5e7eb !important;
             background-color: #ffffff !important;
             color: #000000 !important;
+            width: 100% !important;
+            max-width: 800px !important;
+            margin: 0 auto !important;
+        }
+
+        .pdf-export .no-print {
+            display: none !important;
         }
     </style>
 </head>
-<text_content>
 <body class="text-gray-200 font-sans min-h-screen pb-12">
 
     <!-- Header / Navbar -->
@@ -83,7 +86,7 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
                 <i class="fa-solid fa-sliders text-brandRed"></i> Repair & Client Details
             </h2>
 
-            <form id="invoiceForm" class="space-y-4">
+            <form id="invoiceForm" class="space-y-4" onsubmit="event.preventDefault();">
                 
                 <!-- Invoice Type & Date -->
                 <div class="grid grid-cols-2 gap-4">
@@ -187,19 +190,19 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
                     <i class="fa-solid fa-eye text-brandRed"></i> Live Preview
                 </span>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="downloadPDF()" class="bg-brandRed hover:bg-brandRedDark text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition shadow-md shadow-brandRed/20">
+                    <button type="button" onclick="downloadPDF()" class="bg-brandRed hover:bg-brandRedDark text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition shadow-md shadow-brandRed/20">
                         <i class="fa-solid fa-file-pdf"></i> Save PDF
                     </button>
-                    <button onclick="sendWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition shadow-md shadow-green-600/20">
+                    <button type="button" onclick="sendWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition shadow-md shadow-green-600/20">
                         <i class="fa-brands fa-whatsapp text-lg"></i> Send WhatsApp
                     </button>
                 </div>
             </div>
 
             <!-- PDF Container Container -->
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto pb-4">
                 <!-- Printable Invoice Canvas -->
-                <div id="invoiceCanvas" class="bg-white text-gray-900 p-8 rounded-xl shadow-2xl min-w-[650px] text-sm relative border-t-8 border-brandRed">
+                <div id="invoiceCanvas" class="bg-white text-gray-900 p-8 rounded-xl shadow-2xl min-w-[650px] max-w-[800px] mx-auto text-sm relative border-t-8 border-brandRed">
                     
                     <!-- Top Branding -->
                     <div class="flex justify-between items-start border-b border-gray-200 pb-6 mb-6">
@@ -292,15 +295,15 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
                         <div class="w-1/2 space-y-2 text-xs">
                             <div class="flex justify-between text-gray-600">
                                 <span>Subtotal:</span>
-                                <span font-mono id="summarySubtotal">RM 0.00</span>
+                                <span class="font-mono" id="summarySubtotal">RM 0.00</span>
                             </div>
                             <div class="flex justify-between text-gray-600">
                                 <span>Deposit Paid:</span>
-                                <span font-mono id="summaryDeposit" class="text-green-600 font-semibold">- RM 0.00</span>
+                                <span class="font-mono text-green-600 font-semibold" id="summaryDeposit">- RM 0.00</span>
                             </div>
                             <div class="flex justify-between text-sm font-black border-t-2 border-gray-900 pt-2 text-gray-900">
                                 <span>Balance Due:</span>
-                                <span font-mono id="summaryBalance" class="text-red-600">RM 0.00</span>
+                                <span class="font-mono text-red-600" id="summaryBalance">RM 0.00</span>
                             </div>
                         </div>
                     </div>
@@ -311,10 +314,9 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
                         <ol class="list-decimal list-inside space-y-0.5">
                             <li>Warranty covers hardware replacement under standard usage. Liquid & drop damages void warranty.</li>
                             <li>Devices left unclaimed over 30 days post-repair may incur storage fees or disposal.</li>
-                            <li>Devices left unclaimed over 30 days post-repair may incur storage fees or disposal.</li>
                             <li>Please present this digital invoice/receipt upon device pickup.</li>
                         </ol>
-                        <div class="pt-4 text-center text-gray-400 text-[9px] uppercase tracking-widest font-semibold">
+                        <div class="pt-6 text-center text-gray-400 text-[9px] uppercase tracking-widest font-semibold">
                             *** Thank You For Your Business - Expert Hardware Repair Solutions ***
                         </div>
                     </div>
@@ -442,21 +444,36 @@ SS DYNAMIC FIX INVOICE AND RECEIPT
             window.open(url, '_blank');
         }
 
-        // PDF Generation via html2pdf
+        // Optimized PDF Generation via html2pdf
         function downloadPDF() {
             const element = document.getElementById('invoiceCanvas');
-            const invNo = document.getElementById('invNo').value;
+            const invNo = document.getElementById('invNo').value || 'INV-000000';
             const clientName = document.getElementById('clientName').value || 'Customer';
 
+            // Temporarily apply clean printable PDF styling
+            element.classList.add('pdf-export');
+
             const opt = {
-                margin:       0.3,
+                margin:       [8, 8, 8, 8], // 8mm uniform margins
                 filename:     `${invNo}_${clientName.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    scrollY: 0, 
+                    logging: false,
+                    windowWidth: 800
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.remove('pdf-export');
+            }).catch(err => {
+                console.error('PDF Generation Error:', err);
+                element.classList.remove('pdf-export');
+            });
         }
     </script>
 </body>
